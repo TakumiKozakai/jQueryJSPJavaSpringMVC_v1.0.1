@@ -1,27 +1,10 @@
-package com.example.demo;
-
-import java.util.List;
+package com.fruit.controller.form;
 
 public class Form {
 
-	private List<Fruit> fruitList;
 	private String regDateYear;
 	private String regDateMonth;
 	private String regDateDay;
-
-	/**
-	 * @return fruitList
-	 */
-	public List<Fruit> getFruitList() {
-		return fruitList;
-	}
-
-	/**
-	 * @param fruitList セットする fruitList
-	 */
-	public void setFruitList(List<Fruit> fruitList) {
-		this.fruitList = fruitList;
-	}
 
 	/**
 	 * @return regDateYear

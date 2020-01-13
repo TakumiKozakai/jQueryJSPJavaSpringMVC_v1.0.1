@@ -7,11 +7,11 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>hello</title>
+<title>home</title>
 </head>
 <body>
 	<form:form id="submitForm" modelAttribute="form" action="${action}">
-		<input type="hidden" id="fruitList" name="fruitList" value="${fruitList}" />
+		<input type="hidden" id="fruitBoxList" name="fruitBoxList" value="${fruitBoxList}" />
 
 		<h1>${appName}</h1>
 		<div>
@@ -24,26 +24,20 @@
 				<tr>
 					<th width="50px">選択</th>
 					<th width="50px">新規</th>
-					<th width="100px">果物名</th>
-					<th width="80px">管理番号</th>
+					<th width="100px">箱名</th>
+					<th width="100px">箱番号</th>
 					<th width="150px">登録日</th>
-					<th width="50px">年</th>
-					<th width="50px">月</th>
-					<th width="50px">日</th>
 				</tr>
 			</table>
 		</div>
 		<div id="fruitInfoDiv" style="width: 600px;">
 			<table id="fruitTable" border="1" style="border-collapse: collapse">
 				<tr style="display: none;">
-					<td width="50px"  align="center"><input type="checkbox" name="select" /></td>
+					<td width="50px"  align="center"><input type="checkbox" name="select"/></td>
 					<td width="50px" class="newFlag" align="center" style="color: red;"></td>
-					<td width="100px" class="fruitName"></td>
-					<td width="80px" class="fruitNo"></td>
+					<td width="100px" class="boxName"></td>
+					<td width="100px" class="boxNo"></td>
 					<td width="150px" class="regDate"></td>
-					<td width="50px" class="hdnRegDateYear"></td>
-					<td width="50px" class="hdnRegDateMonth"></td>
-					<td width="50px" class="hdnRegDateDay"></td>
 				</tr>
 			</table>
 		</div>
@@ -66,7 +60,10 @@
 		</div>
 		<br>
 		<div>
-			<input type="button" id="BTN_jadge" value="新規有無確認">
+			<input type="button" id="BTN_checkNewFlag" value="新規有無確認">
+		</div>
+		<div>
+			<input type="button" id="BTN_checkSendStatus" value="発送状態確認">
 		</div>
 		<br>
 		<div>
@@ -81,13 +78,11 @@
 		<br>
 	</form:form>
 	<footer>
-		<script type="text/javascript"
-			src="/demo/resources/js/jQuery-3.4.1.min.js"></script>
+		<script type="text/javascript" src="/demo/resources/js/jQuery-3.4.1.min.js"></script>
 		<script type="text/javascript">
 			var contextPath = "${pageContext.request.contextPath}";
 		</script>
-		<script type="text/javascript" src="/demo/resources/js/hello.js"></script>
-
+		<script type="text/javascript" src="/demo/resources/js/home.js"></script>
 	</footer>
 </body>
 </html>

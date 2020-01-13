@@ -1,10 +1,8 @@
-jQueryJSPJavaSpringMVC_v1.0.0
+jQueryJSPJavaSpringMVC_v1.0.1
 
-jQueryを用いての画面描画（レンダリング）について学習するため作成。
-
-AP層で作成されたオブジェクト型の配列データを
-文字列に変換してモデルアトリビュート。
-モデルアトリビュートされたデータをJSで操作し、
-テーブル形式で出力する。
+下記学習用。
+・jQueryを用いての画面描画（レンダリング）
+・jQueryでの配列操作
+・AjaxでのGET通信、POST通信
 
 --

@@ -1,13 +1,12 @@
-package com.example.demo;
+package com.fruit.controller;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,13 +20,20 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fruit.controller.form.Form;
+import com.fruit.domain.bean.CheckRegDate_RequestBean;
+import com.fruit.domain.bean.CheckRegDate_ResponseBean;
+import com.fruit.domain.bean.CreateFruit_RequestBean;
+import com.fruit.domain.bean.CreateFruit_ResponseBean;
+import com.fruit.domain.service.CreateFruitServiceImpl;
 
-/**
- * @author Kozakaitakumi
- *
+/** *
  */
 @Controller
 public class HomeController {
+
+	@Autowired
+	private CreateFruitServiceImpl createFruitServiceImpl;
 
 	/**
 	 *
@@ -47,13 +53,10 @@ public class HomeController {
 		model.addAttribute("now", LocalDateTime.now());
 		model.addAttribute("appName", appName);
 
-		List<String> fruits = new ArrayList<String>();
-		fruits.add("apple");
-		fruits.add("banana");
-		fruits.add("cherry");
-		model.addAttribute("fruits", fruits);
+		CreateFruit_RequestBean req = new CreateFruit_RequestBean();
+		CreateFruit_ResponseBean res = this.createFruitServiceImpl.process(req);
 
-		this.convertJsonFruitList(model, form);
+		this.convertJsonFruitList(model, res);
 		model.addAttribute("form", form);
 
 		return "home";
@@ -63,43 +66,11 @@ public class HomeController {
 	 * @param model
 	 * @param form
 	 */
-	private void convertJsonFruitList(Model model, Form form) {
-
-		Fruit apple = new Fruit(
-				"apple",
-				"001",
-				"2019年12月15日",
-				"2019",
-				"12",
-				"15",
-				false);
-		Fruit banana = new Fruit(
-				"banana",
-				"002",
-				"2019年12月15日",
-				"2019",
-				"12",
-				"15",
-				false);
-		Fruit grape = new Fruit(
-				"grape",
-				"001",
-				"2019年12月15日",
-				"2019",
-				"12",
-				"15",
-				false);
-
-		ArrayList<Fruit> fruitList = new ArrayList<Fruit>();
-		fruitList.add(apple);
-		fruitList.add(banana);
-		fruitList.add(grape);
-
-		form.setFruitList(fruitList);
+	private void convertJsonFruitList(Model model, CreateFruit_ResponseBean res) {
 
 		try {
 			ObjectMapper objectMapper = new ObjectMapper();
-			model.addAttribute("fruitList", replaceSingleQuoteJson(objectMapper.writeValueAsString(fruitList)));
+			model.addAttribute("fruitBoxList", replaceSingleQuoteJson(objectMapper.writeValueAsString(res.getFruitBoxList())));
 
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
@@ -122,10 +93,10 @@ public class HomeController {
 
 		ObjectMapper objectMapper = new ObjectMapper();
 
-		checkRegDate_RequestBean req = new checkRegDate_RequestBean();
-		checkRegDate_ResponseBean res = new checkRegDate_ResponseBean();
+		CheckRegDate_RequestBean req = new CheckRegDate_RequestBean();
+		CheckRegDate_ResponseBean res = new CheckRegDate_ResponseBean();
 
-		req = objectMapper.readValue(requestStrJson, checkRegDate_RequestBean.class);
+		req = objectMapper.readValue(requestStrJson, CheckRegDate_RequestBean.class);
 		res.setResult("success");
 
 		if(4 < req.getRegDateYear().length()) {
@@ -159,8 +130,8 @@ public class HomeController {
 
 		ObjectMapper objectMapper = new ObjectMapper();
 
-		checkRegDate_RequestBean req = new checkRegDate_RequestBean();
-		checkRegDate_ResponseBean res = new checkRegDate_ResponseBean();
+		CheckRegDate_RequestBean req = new CheckRegDate_RequestBean();
+		CheckRegDate_ResponseBean res = new CheckRegDate_ResponseBean();
 
 		BeanUtils.copyProperties(form, req);
 		res.setResult("success");

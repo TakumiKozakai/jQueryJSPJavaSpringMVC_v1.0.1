@@ -30,6 +30,6 @@
 		location="classpath:*.properties" />
 
 	<context:component-scan
-		base-package="com.example.demo" />
+		base-package="com.fruit" />
 
 </beans>
