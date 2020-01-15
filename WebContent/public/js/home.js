@@ -40,25 +40,25 @@ $(document).ready(function() {
 		var boxName = $("input[name='select']:checkbox:checked").parent().parent().find("td.boxName").text();
 
 		// 選択された箱を取得
-		$.each(objFruitBoxList, function(i, row) {
-			if (boxName === row.boxName) {
-				fruitBox.push(row);
-				return;
-			}
-		});
-
-		// 選択された箱を取得
-//		$.each(objFruitBoxList, function(i, rowa) {
-//			if (boxName === rowa.boxName) {
-//				$.each(rowa.fruitList, function(i, rowb) {
-//					// 発送済があればtrue
-//					if ("発送済" === rowb.sendStatusCd) {
-//						sendStatusFlag = true;
-//						return;
-//					}
-//				});
+//		$.each(objFruitBoxList, function(i, row) {
+//			if (boxName === row.boxName) {
+//				fruitBox.push(row);
+//				return;
 //			}
 //		});
+
+		// 選択された箱を取得
+		$.each(objFruitBoxList, function(i, rowa) {
+			if (boxName === rowa.boxName) {
+				$.each(rowa.fruitList, function(i, rowb) {
+					// 発送済があればtrue
+					if ("発送済" === rowb.sendStatusCd) {
+						sendStatusFlag = true;
+						return;
+					}
+				});
+			}
+		});
 
 		// 選択された箱の果物リスト内にある果物.発送状態コードを取得
 //		$.each(fruitBox[0].fruitList, function(i, row) {
@@ -66,13 +66,13 @@ $(document).ready(function() {
 //		});
 
 		// 選択された箱の果物リスト内にある果物.発送状態コードを取得
-		$.each(fruitBox[0].fruitList, function(i, row) {
-			// 発送済があればtrue
-			if ("発送済" === row.sendStatusCd) {
-				sendStatusFlag = true;
-				return;
-			}
-		});
+//		$.each(fruitBox[0].fruitList, function(i, row) {
+//			// 発送済があればtrue
+//			if ("発送済" === row.sendStatusCd) {
+//				sendStatusFlag = true;
+//				return;
+//			}
+//		});
 
 		// 「発送済」有無チェック
 //		$.each(sendStatusCdList, function(i, row) {
