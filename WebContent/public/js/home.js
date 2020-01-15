@@ -29,7 +29,7 @@ $(document).ready(function() {
 	$("#BTN_checkSendStatus").click(function() {
 		var boxName;
 		var fruitBox = [];
-		var fruitList = [];
+		var sendStatusCdList = [];
 		var sendStatusFlag;
 
 		// 選択された箱名を取得
@@ -37,28 +37,24 @@ $(document).ready(function() {
 			boxName = $(this).parent().parent().find("td.boxName").text();
 		});
 
-		// 選択された箱を格納
-		$.each(objFruitBoxList, function(i, objFruitBox) {
-			if (boxName === objFruitBox.boxName) {
-				fruitBox.push(objFruitBox);
+		// 選択された箱を取得
+		$.each(objFruitBoxList, function(i, row) {
+			if (boxName === row.boxName) {
+				fruitBox.push(row);
 				return;
 			}
 		});
 
-		// 選択された箱の果物リストを格納
-		$.each(fruitBox, function(i, row) {
-			fruitList.push(row.fruitList);
+		// 選択された箱の果物リスト内にある果物.発送状態コードを取得
+		$.each(fruitBox[0].fruitList, function(i, row) {
+			sendStatusCdList.push(row.sendStatusCd);
 		});
 
-		// 要素を抽出する
-//		fruitBox = $.grep(objFruitBoxList, function(obj, idx) {
-//			return (obj.boxName === boxName);
-//		});
-
 		// 「発送済」有無チェック
-		$.each(fruitList, function(i, fruit) {
+		$.each(sendStatusCdList, function(i, row) {
+			alert(row);
 			// 発送済があればtrue
-			if ("発送済" === fruit.sendStatusCd) {
+			if ("発送済" === row) {
 				sendStatusFlag = true;
 				return;
 			}
