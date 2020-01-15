@@ -27,15 +27,17 @@ $(document).ready(function() {
 	});
 	// 発送状態確認ボタン押下イベント
 	$("#BTN_checkSendStatus").click(function() {
-		var boxName;
 		var fruitBox = [];
 		var sendStatusCdList = [];
 		var sendStatusFlag;
 
 		// 選択された箱名を取得
-		$($("input[name='select']:checkbox:checked").get()).each(function() {
-			boxName = $(this).parent().parent().find("td.boxName").text();
-		});
+//		$($("input[name='select']:checkbox:checked").get()).each(function() {
+//			boxName = $(this).parent().parent().find("td.boxName").text();
+//		});
+
+		// 選択された箱名を取得
+		var boxName = $("input[name='select']:checkbox:checked").parent().parent().find("td.boxName").text();
 
 		// 選択された箱を取得
 		$.each(objFruitBoxList, function(i, row) {
@@ -45,20 +47,41 @@ $(document).ready(function() {
 			}
 		});
 
+		// 選択された箱を取得
+//		$.each(objFruitBoxList, function(i, rowa) {
+//			if (boxName === rowa.boxName) {
+//				$.each(rowa.fruitList, function(i, rowb) {
+//					// 発送済があればtrue
+//					if ("発送済" === rowb.sendStatusCd) {
+//						sendStatusFlag = true;
+//						return;
+//					}
+//				});
+//			}
+//		});
+
+		// 選択された箱の果物リスト内にある果物.発送状態コードを取得
+//		$.each(fruitBox[0].fruitList, function(i, row) {
+//			sendStatusCdList.push(row.sendStatusCd);
+//		});
+
 		// 選択された箱の果物リスト内にある果物.発送状態コードを取得
 		$.each(fruitBox[0].fruitList, function(i, row) {
-			sendStatusCdList.push(row.sendStatusCd);
-		});
-
-		// 「発送済」有無チェック
-		$.each(sendStatusCdList, function(i, row) {
-			alert(row);
 			// 発送済があればtrue
-			if ("発送済" === row) {
+			if ("発送済" === row.sendStatusCd) {
 				sendStatusFlag = true;
 				return;
 			}
 		});
+
+		// 「発送済」有無チェック
+//		$.each(sendStatusCdList, function(i, row) {
+//			// 発送済があればtrue
+//			if ("発送済" === row) {
+//				sendStatusFlag = true;
+//				return;
+//			}
+//		});
 
 		if (sendStatusFlag) {
 			window.alert("発送済があります。");
@@ -94,7 +117,9 @@ function init() {
 	// フルーツテーブルレンダリング
 	renderFruitTable();
 }
-
+/**
+ * 追加
+ */
 function addFruit() {
 	// 操作日付生成
 	today = new Date();
@@ -121,7 +146,6 @@ function addFruit() {
 	$("#fruitName").val("");
 	$("#fruitNo").val("");
 }
-
 /**
  * 登録日コピー
  */
