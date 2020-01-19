@@ -89,20 +89,29 @@ $(document).ready(function() {
 			window.alert("発送済がありません。");
 		}
 	});
-	// 登録日変更ボタン押下イベント(POST送信)
+	// 登録日更新ボタン押下イベント(GET送信)
 	$("#BTN_updateRegDateGet").click(function() {
 		// 単項目チェック
 		checkRegDateGet();
-		// 登録日変更
+		// 登録日更新
 		updateRegDate();
 	});
-	// 登録日変更ボタン押下イベント(POST送信)
-	$("#BTN_updateRegDatePost").click(function() {
+	// 未発送押下イベント
+	$("#yetSent").click(function() {
+		$("#alreadySent").prop("checked", false);
+	});
+	// 発送済押下イベント
+	$("#alreadySent").click(function() {
+		$("#yetSent").prop("checked", false);
+	});
+	// 発送日更新ボタン押下イベント(POST送信)
+	$("#BTN_updateSentDatePost").click(function() {
 		// 単項目チェック
-		checkRegDatePost();
-		// 登録日変更
-		updateRegDate();
+		checkSentDatePost();
+		// 登録日更新
+		updateSentDate();
 	});
+
 });
 /**
  * 項目初期化
@@ -158,7 +167,7 @@ function copyRegDate() {
 	});
 }
 /**
- * 単項目チェック（登録日変更GET）
+ * 単項目チェック（登録日更新GET）
  */
 function checkRegDateGet() {
 	// 入力された登録日をController側でチェックする
@@ -167,7 +176,7 @@ function checkRegDateGet() {
 		regDateMonth : $("#inputRegDateMonth").val(),
 		regDateDay : $("#inputRegDateDay").val()
 	}
-	// Ajax
+
 	$.ajax({
 		type : "GET",
 		async : true,
@@ -179,8 +188,8 @@ function checkRegDateGet() {
 		dataType : 'json',
 		timeout : 70000,
 		success : function(data) {
-			if (data.result === "success") {
-				// 登録日変更
+			if (data.result === "NORMAL") {
+				// 登録日更新
 				updateRegDate();
 			} else {
 				alert("レスポンスエラー");
@@ -192,78 +201,114 @@ function checkRegDateGet() {
 	})
 }
 /**
- * 単項目チェック（登録日変更POST）
- */
-function checkRegDatePost() {
-	// 入力された登録日をController側でチェックする
-	// requestBean = {
-	// regDateYear : $("#inputRegDateYear").val(),
-	// regDateMonth : $("#inputRegDateMonth").val(),
-	// regDateDay : $("#inputRegDateDay").val()
-	// }
-	// Ajax
-	$.ajax({
-		// type : "GET",
-		type : "POST",
-		async : true,
-		contentType : "application/json",
-		url : contextPath + "/checkRegDatePost",
-		data : {
-			form : $("#submitForm").serialize()
-		// requestStrJson : JSON.stringify(requestBean)
-		},
-		dataType : 'json',
-		timeout : 70000,
-		success : function(data) {
-			if (data.result === "success") {
-				// 登録日変更
-				updateRegDate();
-			} else {
-				alert("レスポンスエラー");
-			}
-		},
-		error : function() {
-			alert("Ajax通信エラー");
-		}
-	})
-}
-/**
- * 登録日変更
+ * 登録日更新
+ * 登録日を入力された年月日で更新する
+ * 新規分のもののみ更新する
+ * 番号が同一の場合は、同一分全て更新する
  */
 function updateRegDate() {
-	// 登録日を入力された年月日で変更する
-	// 新規分のもののみ変更する
-	// 番号が同一の場合は、同一分全て変更する
-
-	// 日付生成
-	// 登録日-年
-	var inputtedRegDateYear = $("#inputRegDateYear").val();
-	// 登録日-月
-	var inputtedRegDateMonth = $("#inputRegDateMonth").val();
-	// 登録日-日
-	var inputtedRegDateDay = $("#inputRegDateDay").val();
-	// 登録日
+	// 登録日生成
+	var inputtedRegDateYear = $("#regDateYear").val();		// 登録日-年
+	var inputtedRegDateMonth = $("#regDateMonth").val();	// 登録日-月
+	var inputtedRegDateDay = $("#regDateDay").val();		// 登録日-日
 	var inputtedRegDate = inputtedRegDateYear + "年" + inputtedRegDateMonth + "月" + inputtedRegDateDay + "日"
 
-	// 変更対象判定用 番号取得
-	var row = [];
-	row = $("input[name='select']:checkbox:checked").get();
-	var fruitNo = $(row).parent().parent().find("td.fruitNo").text();
-
+	// 更新対象取得
+	var boxName = $("input[name='select']:checkbox:checked").parent().parent().find("td.boxName").text();
+	// 登録日生成
 	$.each(objFruitBoxList, function(i, row) {
 		// 新規分でない場合、スキップ
 		if (!row.newFlag) {
-			return;
+			alert("新規分でないため、登録日は更新できません。");
+			return false;
 		}
-		// 番号が同一の場合、日付変更
-		if (fruitNo === row.fruitNo) {
+		// 番号が同一の場合、日付更新
+		if (boxName === row.boxName) {
 			row.regDate = inputtedRegDate;
 			row.regDateYear = inputtedRegDateYear;
 			row.regDateMonth = inputtedRegDateMonth;
 			row.regDateDay = inputtedRegDateDay;
 		}
 	});
+	// formのフルーツリストにobjFruitBoxListを設定
+	$("#fruitBoxList").val(JSON.stringify(objFruitBoxList));
+	// フルーツテーブルレンダリング
+	renderFruitTable();
+}
+/**
+ * 単項目チェック（発送日更新POST）
+ */
+function checkSentDatePost() {
 
+	var fruitBoxList = [];
+	$.each(objFruitBoxList, function(i, row) {
+		var fruitBox = {
+				"boxName" : row.boxName,
+				"regDate" : row.regDate,
+				"sentDate" : row.sentDate,
+		}
+		fruitBoxList.push(fruitBox);
+	});
+
+	var form = {
+			regDateYear : $("#regDateYear").val(),
+			regDateMonth : $("#regDateMonth").val(),
+			regDateDay : $("#regDateDay").val(),
+			yetSent : $("#yetSent").val(),
+			alreadySent : $("#alreadySent").val(),
+			sentDateYear : $("#sentDateYear").val(),
+			sentDateMonth : $("#sentDateMonth").val(),
+			sentDateDay : $("#sentDateDay").val()
+	}
+//	form.fruitBoxList = $.parseJSON(replaceDoubleQuotes($("#fruitBoxList").val()));
+
+//	objFruitBoxList = $.parseJSON(replaceDoubleQuotes($("#fruitBoxList").val()));
+
+	var jsonString = $('form').serializeArray();
+
+	$.ajax({
+		type : "POST",
+		async: true,
+		contentType : "application/json",
+		url : contextPath + "/checkSentDatePost",
+//		data : JSON.stringify(form),
+		data : JSON.stringify(jsonString),
+		dataType : 'json',
+		success : function(data) {
+			if (data.result === "NORMAL") {
+				// 発送日更新
+				updateSentDate();
+			} else {
+				alert("レスポンスエラー");
+			}
+		},
+		error : function() {
+			alert("Ajax通信エラー");
+		}
+	})
+}
+/**
+ * 発送日更新
+ * 発送日を入力された年月日で更新する
+ */
+function updateSentDate() {
+	// 発送日生成
+	var inputtedSentDateYear = $("#sentDateYear").val();	// 発送日-年
+	var inputtedSentDateMonth = $("#sentDateMonth").val();	// 発送日-月
+	var inputtedSentDateDay = $("#sentDateDay").val();		// 発送日-日
+	var inputtedSentDate = inputtedSentDateYear + "年" + inputtedSentDateMonth + "月" + inputtedSentDateDay + "日"
+
+	// 更新対象取得
+	var boxName = $("input[name='select']:checkbox:checked").parent().parent().find("td.boxName").text();
+	// 発送日生成
+	$.each(objFruitBoxList, function(i, row) {
+		if (boxName === row.boxName) {
+			row.sentDate = inputtedSentDate;
+			row.sentDateYear = inputtedSentDateYear;
+			row.sentDateMonth = inputtedSentDateMonth;
+			row.sentDateDay = inputtedSentDateDay;
+		}
+	});
 	// formのフルーツリストにobjFruitBoxListを設定
 	$("#fruitBoxList").val(JSON.stringify(objFruitBoxList));
 	// フルーツテーブルレンダリング
@@ -287,6 +332,7 @@ function renderFruitTable() {
 		trAdd.find("td.boxName").text(row.boxName);
 		trAdd.find("td.boxNo").text(row.boxNo);
 		trAdd.find("td.regDate").text(row.regDate);
+		trAdd.find("td.sentDate").text(row.sentDate);
 		trAdd.css("display", "").appendTo("#fruitTable");
 		// スクロールの設定
 		if (i == 3) {

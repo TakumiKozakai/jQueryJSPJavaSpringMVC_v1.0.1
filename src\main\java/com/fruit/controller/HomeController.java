@@ -2,10 +2,10 @@ package com.fruit.controller;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -13,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -23,8 +24,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fruit.controller.form.Form;
 import com.fruit.domain.bean.CheckRegDate_RequestBean;
 import com.fruit.domain.bean.CheckRegDate_ResponseBean;
+import com.fruit.domain.bean.CheckSentDate_RequestBean;
+import com.fruit.domain.bean.CheckSentDate_ResponseBean;
 import com.fruit.domain.bean.CreateFruit_RequestBean;
 import com.fruit.domain.bean.CreateFruit_ResponseBean;
+import com.fruit.domain.data.FruitBox;
 import com.fruit.domain.service.CreateFruitServiceImpl;
 
 /** *
@@ -70,7 +74,7 @@ public class HomeController {
 
 		try {
 			ObjectMapper objectMapper = new ObjectMapper();
-			model.addAttribute("fruitBoxList", replaceSingleQuoteJson(objectMapper.writeValueAsString(res.getFruitBoxList())));
+			model.addAttribute("fruitBoxList", this.replaceSingleQuoteJson(objectMapper.writeValueAsString(res.getFruitBoxList())));
 
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
@@ -97,16 +101,16 @@ public class HomeController {
 		CheckRegDate_ResponseBean res = new CheckRegDate_ResponseBean();
 
 		req = objectMapper.readValue(requestStrJson, CheckRegDate_RequestBean.class);
-		res.setResult("success");
+		res.setResult("NORMAL");
 
 		if(4 < req.getRegDateYear().length()) {
-			res.setResult("error");
+			res.setResult("ERROR");
 		}
 		if(2 < req.getRegDateMonth().length()) {
-			res.setResult("error");
+			res.setResult("ERROR");
 		}
 		if(2 < req.getRegDateDay().length()) {
-			res.setResult("error");
+			res.setResult("ERROR");
 		}
 
 		String strResponse = objectMapper.writeValueAsString(res);
@@ -117,33 +121,33 @@ public class HomeController {
 
 	/**
 	 * @param form
-	 * @param model
 	 * @return
 	 * @throws IOException
-	 * @throws JsonMappingException
-	 * @throws JsonParseException
 	 */
-	@PostMapping(value = "/checkRegDatePost")
+	@PostMapping(value = "/checkSentDatePost", produces="application/json; charset=UTF-8")
 	@ResponseBody
-	public String checkRegDate(@ModelAttribute("form") Form form, HttpServletRequest request)
-			throws JsonParseException, JsonMappingException, IOException {
+//	public String checkSentDate(@RequestBody Form form) throws IOException {
+		public String checkSentDate(@RequestBody String form) throws IOException {
 
 		ObjectMapper objectMapper = new ObjectMapper();
+		List<FruitBox> fruitBoxList = objectMapper.readValue(form.FruitBoxList(), Form.class);
 
-		CheckRegDate_RequestBean req = new CheckRegDate_RequestBean();
-		CheckRegDate_ResponseBean res = new CheckRegDate_ResponseBean();
+		CheckSentDate_RequestBean req = new CheckSentDate_RequestBean();
+		CheckSentDate_ResponseBean res = new CheckSentDate_ResponseBean();
 
-		BeanUtils.copyProperties(form, req);
-		res.setResult("success");
+		req = objectMapper.readValue(form, CheckSentDate_RequestBean.class);
 
-		if(4 < req.getRegDateYear().length()) {
-			res.setResult("error");
+//		BeanUtils.copyProperties(form, req);
+		res.setResult("NORMAL");
+
+		if(4 < req.getSentDateYear().length()) {
+			res.setResult("ERROR");
 		}
-		if(2 < req.getRegDateMonth().length()) {
-			res.setResult("error");
+		if(2 < req.getSentDateMonth().length()) {
+			res.setResult("ERROR");
 		}
-		if(2 < req.getRegDateDay().length()) {
-			res.setResult("error");
+		if(2 < req.getSentDateDay().length()) {
+			res.setResult("ERROR");
 		}
 
 		String strResponse = objectMapper.writeValueAsString(res);
