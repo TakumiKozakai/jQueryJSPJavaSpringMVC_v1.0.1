@@ -240,39 +240,50 @@ function updateRegDate() {
  */
 function checkSentDatePost() {
 
+	var form = {};
+	form["yetSent"] = $("#yetSent").val();
+	form["alreadySent"] = $("#alreadySent").val();
+
 	var fruitBoxList = [];
-	$.each(objFruitBoxList, function(i, row) {
-		var fruitBox = {
-				"boxName" : row.boxName,
-				"regDate" : row.regDate,
-				"sentDate" : row.sentDate,
-		}
-		fruitBoxList.push(fruitBox);
+	var tableData = $("#fruitTable tr");
+	tableData.each(function(i) {
+        var $elm = $(this);
+
+        var boxName = $elm.find(".boxName").text();
+        var regDate = $elm.find(".regDate").text();
+        var sentDate = $elm.find(".sentDate").text();
+
+        var tableObj = {
+        		"boxName" : boxName,
+        		"regDate" : regDate,
+        		"sentDate" : sentDate
+        		};
+        fruitBoxList.push(tableObj);
 	});
 
-	var form = {
-			regDateYear : $("#regDateYear").val(),
-			regDateMonth : $("#regDateMonth").val(),
-			regDateDay : $("#regDateDay").val(),
-			yetSent : $("#yetSent").val(),
-			alreadySent : $("#alreadySent").val(),
-			sentDateYear : $("#sentDateYear").val(),
-			sentDateMonth : $("#sentDateMonth").val(),
-			sentDateDay : $("#sentDateDay").val()
-	}
-//	form.fruitBoxList = $.parseJSON(replaceDoubleQuotes($("#fruitBoxList").val()));
+	form["fruitBoxList"] = fruitBoxList;
+//	form["fruitBoxList"] = objFruitBoxList;
+//	form["fruitBoxList"] = $.parseJSON(replaceDoubleQuotes($("#fruitBoxList").val()));
+//	form["fruitBoxList"] = replaceDoubleQuotes($("#fruitBoxList").val());
 
-//	objFruitBoxList = $.parseJSON(replaceDoubleQuotes($("#fruitBoxList").val()));
-
-	var jsonString = $('form').serializeArray();
+//	var form = {
+//			regDateYear : $("#regDateYear").val(),
+//			regDateMonth : $("#regDateMonth").val(),
+//			regDateDay : $("#regDateDay").val(),
+//			yetSent : $("#yetSent").val(),
+//			alreadySent : $("#alreadySent").val(),
+//			sentDateYear : $("#sentDateYear").val(),
+//			sentDateMonth : $("#sentDateMonth").val(),
+//			sentDateDay : $("#sentDateDay").val()
+//	}
 
 	$.ajax({
 		type : "POST",
 		async: true,
 		contentType : "application/json",
 		url : contextPath + "/checkSentDatePost",
-//		data : JSON.stringify(form),
-		data : JSON.stringify(jsonString),
+		data : JSON.stringify(form),
+//		data : form,
 		dataType : 'json',
 		success : function(data) {
 			if (data.result === "NORMAL") {

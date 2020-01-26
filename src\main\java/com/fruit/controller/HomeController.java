@@ -2,7 +2,6 @@ package com.fruit.controller;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -28,7 +28,6 @@ import com.fruit.domain.bean.CheckSentDate_RequestBean;
 import com.fruit.domain.bean.CheckSentDate_ResponseBean;
 import com.fruit.domain.bean.CreateFruit_RequestBean;
 import com.fruit.domain.bean.CreateFruit_ResponseBean;
-import com.fruit.domain.data.FruitBox;
 import com.fruit.domain.service.CreateFruitServiceImpl;
 
 /** *
@@ -74,7 +73,7 @@ public class HomeController {
 
 		try {
 			ObjectMapper objectMapper = new ObjectMapper();
-			model.addAttribute("fruitBoxList", this.replaceSingleQuoteJson(objectMapper.writeValueAsString(res.getFruitBoxList())));
+			model.addAttribute("fruitBoxList", this.replaceSingleQuote(objectMapper.writeValueAsString(res.getFruitBoxList())));
 
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
@@ -124,33 +123,34 @@ public class HomeController {
 	 * @return
 	 * @throws IOException
 	 */
-	@PostMapping(value = "/checkSentDatePost", produces="application/json; charset=UTF-8")
+	@PostMapping(value = "/checkSentDatePost")
 	@ResponseBody
-//	public String checkSentDate(@RequestBody Form form) throws IOException {
-		public String checkSentDate(@RequestBody String form) throws IOException {
+	public String checkSentDate(@RequestBody String form) {
 
-		ObjectMapper objectMapper = new ObjectMapper();
-		List<FruitBox> fruitBoxList = objectMapper.readValue(form.FruitBoxList(), Form.class);
+		String strResponse  = "";
 
-		CheckSentDate_RequestBean req = new CheckSentDate_RequestBean();
-		CheckSentDate_ResponseBean res = new CheckSentDate_ResponseBean();
+		try {
+			ObjectMapper objectMapper = new ObjectMapper();
 
-		req = objectMapper.readValue(form, CheckSentDate_RequestBean.class);
+			CheckSentDate_RequestBean req = new CheckSentDate_RequestBean();
+			CheckSentDate_ResponseBean res = new CheckSentDate_ResponseBean();
 
-//		BeanUtils.copyProperties(form, req);
-		res.setResult("NORMAL");
+					req = objectMapper.readValue(form, CheckSentDate_RequestBean.class);
+			//		List<FruitBox> fruitBoxList  = new ArrayList<FruitBox>();
 
-		if(4 < req.getSentDateYear().length()) {
-			res.setResult("ERROR");
+//			Form formA = objectMapper.readValue(form, Form.class);
+
+			res.setResult("NORMAL");
+
+			strResponse = objectMapper.writeValueAsString(res);
+
+		} catch (JsonGenerationException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		if(2 < req.getSentDateMonth().length()) {
-			res.setResult("ERROR");
-		}
-		if(2 < req.getSentDateDay().length()) {
-			res.setResult("ERROR");
-		}
-
-		String strResponse = objectMapper.writeValueAsString(res);
 
 		return strResponse;
 
@@ -160,7 +160,7 @@ public class HomeController {
 	 * @param target
 	 * @return
 	 */
-	private String replaceSingleQuoteJson(String target) {
+	private String replaceSingleQuote(String target) {
 		return target.replaceAll("'", "\\\\'").replaceAll("(?<!\\\\)\"", "'");
 	}
 
