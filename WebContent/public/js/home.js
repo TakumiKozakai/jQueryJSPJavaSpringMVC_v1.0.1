@@ -1,117 +1,11 @@
-// フルーツデータ
-var objFruitBoxList = [];
+/** 項目 */
+var objFruitBoxList = []; // フルーツデータ
 
 $(document).ready(function() {
 	// 項目初期化
 	init();
-	// 追加ボタン押下イベント
-	$("#BTN_addFruit").click(function() {
-		// 追加
-		addFruit()
-	});
-	// 新規有無確認ボタン押下イベント
-	$("#BTN_checkNewFlag").click(function() {
-		var isNew;
-		// 新規分有無チェック
-		$.each(objFruitBoxList, function(i, row) {
-			if (row.newFlag) {
-				isNew = true;
-				return;
-			}
-		});
-		if (isNew) {
-			window.alert("新規分が存在しています。");
-		} else {
-			window.alert("新規分は存在していません。");
-		}
-	});
-	// 発送状態確認ボタン押下イベント
-	$("#BTN_checkSendStatus").click(function() {
-		var fruitBox = [];
-		var sendStatusCdList = [];
-		var sendStatusFlag;
-
-		// 選択された箱名を取得
-//		$($("input[name='select']:checkbox:checked").get()).each(function() {
-//			boxName = $(this).parent().parent().find("td.boxName").text();
-//		});
-
-		// 選択された箱名を取得
-		var boxName = $("input[name='select']:checkbox:checked").parent().parent().find("td.boxName").text();
-
-		// 選択された箱を取得
-//		$.each(objFruitBoxList, function(i, row) {
-//			if (boxName === row.boxName) {
-//				fruitBox.push(row);
-//				return;
-//			}
-//		});
-
-		// 選択された箱を取得
-		$.each(objFruitBoxList, function(i, rowa) {
-			if (boxName === rowa.boxName) {
-				$.each(rowa.fruitList, function(i, rowb) {
-					// 発送済があればtrue
-					if ("発送済" === rowb.sendStatusCd) {
-						sendStatusFlag = true;
-						return;
-					}
-				});
-			}
-		});
-
-		// 選択された箱の果物リスト内にある果物.発送状態コードを取得
-//		$.each(fruitBox[0].fruitList, function(i, row) {
-//			sendStatusCdList.push(row.sendStatusCd);
-//		});
-
-		// 選択された箱の果物リスト内にある果物.発送状態コードを取得
-//		$.each(fruitBox[0].fruitList, function(i, row) {
-//			// 発送済があればtrue
-//			if ("発送済" === row.sendStatusCd) {
-//				sendStatusFlag = true;
-//				return;
-//			}
-//		});
-
-		// 「発送済」有無チェック
-//		$.each(sendStatusCdList, function(i, row) {
-//			// 発送済があればtrue
-//			if ("発送済" === row) {
-//				sendStatusFlag = true;
-//				return;
-//			}
-//		});
-
-		if (sendStatusFlag) {
-			window.alert("発送済があります。");
-		} else {
-			window.alert("発送済がありません。");
-		}
-	});
-	// 登録日更新ボタン押下イベント(GET送信)
-	$("#BTN_updateRegDateGet").click(function() {
-		// 単項目チェック
-		checkRegDateGet();
-		// 登録日更新
-		updateRegDate();
-	});
-	// 未発送押下イベント
-	$("#yetSent").click(function() {
-		$("#alreadySent").prop("checked", false);
-	});
-	// 発送済押下イベント
-	$("#alreadySent").click(function() {
-		$("#yetSent").prop("checked", false);
-	});
-	// 発送日更新ボタン押下イベント(POST送信)
-	$("#BTN_updateSentDatePost").click(function() {
-		// 単項目チェック
-		checkSentDatePost();
-		// 登録日更新
-		updateSentDate();
-	});
-
+	// トリガーセット
+	setTrigger();
 });
 /**
  * 項目初期化
@@ -127,9 +21,62 @@ function init() {
 	renderFruitTable();
 }
 /**
+ * ボタンイベントセット
+ */
+function setTrigger() {
+	// 追加ボタン押下イベント
+	$("#BTN_addFruitBox").click(function() {
+		// 単孔目チェック
+		validateCheckAddFruitBox();
+		// 追加
+		addFruitBox();
+	});
+	// 新規有無確認ボタン押下イベント
+	$("#BTN_checkNewFlag").click(function() {
+		checkNewFlag();
+	});
+	// 発送状態確認ボタン押下イベント
+	$("#BTN_checkSendStatus").click(function() {
+		checkSendStatus();
+	});
+	// 登録日更新ボタン押下イベント(GET送信)
+	$("#BTN_updateRegDateGet").click(function() {
+		// 単項目チェック
+		checkRegDateGet();
+	});
+	// 未発送押下イベント
+	$("#yetSent").click(function() {
+		$("#alreadySent").prop("checked", false);
+	});
+	// 発送済押下イベント
+	$("#alreadySent").click(function() {
+		$("#yetSent").prop("checked", false);
+	});
+	// 発送日更新ボタン押下イベント(POST送信)
+	$("#BTN_updateSentDatePost").click(function() {
+		// 単項目チェック
+		checkSentDatePost();
+	});
+}
+/**
+ * 単項目チェック（追加時）
+ */
+function validateCheckAddFruitBox() {
+	// 必須チェック
+	if ("" === $("#boxName").val()) {
+		window.alert("箱名は省略できません。");
+		return false;
+	}
+	// 必須チェック
+	if ("" === $("#boxNo").val()) {
+		window.alert("箱番号は省略できません。");
+		return false;
+	}
+}
+/**
  * 追加
  */
-function addFruit() {
+function addFruitBox() {
 	// 操作日付生成
 	today = new Date();
 	var regDate = today.getFullYear() + "年" + (today.getMonth() + 1) + "月" + today.getDate() + "日";
@@ -137,12 +84,10 @@ function addFruit() {
 	// 追加用フルーツデータ生成
 	var fruitData = {
 		newFlag : true,
-		fruitName : $("#fruitName").val(),
-		fruitNo : $("#fruitNo").val(),
+		boxName : $("#boxName").val(),
+		boxNo : $("#boxNo").val(),
 		regDate : regDate,
-		regDateYear : today.getFullYear(),
-		regDateMonth : (today.getMonth() + 1),
-		regDateDay : today.getDate()
+		sentDate : regDate
 	}
 
 	// 生成したフルーツデータを格納
@@ -152,8 +97,51 @@ function addFruit() {
 	// フルーツテーブルレンダリング
 	renderFruitTable();
 	// 入力値クリア
-	$("#fruitName").val("");
-	$("#fruitNo").val("");
+	$("#boxName").val("");
+	$("#boxNo").val("");
+}
+/**
+ * 新規分有無チェック
+ */
+function checkNewFlag() {
+	var isNew = false;
+	// 新規分有無チェック
+	$.each(objFruitBoxList, function(i, row) {
+		if (row.newFlag) {
+			isNew = true;
+			return;
+		}
+	});
+	if (isNew) {
+		window.alert("新規分が存在しています。");
+	} else {
+		window.alert("新規分は存在していません。");
+	}
+}
+/**
+ * 発送状態チェック
+ */
+function checkSendStatus() {
+	var sendStatusFlag = false;
+	// 選択された箱名を取得
+	var boxName = $("input[name='select']:checkbox:checked").parent().parent().find("td.boxName").text();
+	// 選択された箱を取得
+	$.each(objFruitBoxList, function(i, rowa) {
+		if (boxName === rowa.boxName) {
+			$.each(rowa.fruitList, function(i, rowb) {
+				// 発送済があればtrue
+				if ("発送済" === rowb.sendStatusCd) {
+					sendStatusFlag = true;
+					return;
+				}
+			});
+		}
+	});
+	if (sendStatusFlag) {
+		window.alert("発送済があります。");
+	} else {
+		window.alert("発送済がありません。");
+	}
 }
 /**
  * 登録日コピー
@@ -170,7 +158,7 @@ function copyRegDate() {
  * 単項目チェック（登録日更新GET）
  */
 function checkRegDateGet() {
-	// 入力された登録日をController側でチェックする
+	// リクエストビーン生成
 	requestBean = {
 		regDateYear : $("#inputRegDateYear").val(),
 		regDateMonth : $("#inputRegDateMonth").val(),
@@ -183,7 +171,7 @@ function checkRegDateGet() {
 		contentType : "application/json",
 		url : contextPath + "/checkRegDateGet",
 		data : {
-			requestStrJson : JSON.stringify(requestBean)
+			jsonRequestBean : JSON.stringify(requestBean)
 		},
 		dataType : 'json',
 		timeout : 70000,
@@ -239,10 +227,15 @@ function updateRegDate() {
  * 単項目チェック（発送日更新POST）
  */
 function checkSentDatePost() {
+	// リクエストビーン生成
+	var jsonRequestBean = {};
 
-	var form = {};
-	form["yetSent"] = $("#yetSent").val();
-	form["alreadySent"] = $("#alreadySent").val();
+	var sentFlag = "";
+	if ($("#yetSent").is(":checked")) {
+		sentFlag = $("#yetSent").val();
+	} else if ($("#alreadySent").is(":checked")) {
+		sentFlag = $("#alreadySent").val();
+	}
 
 	var fruitBoxList = [];
 	var tableData = $("#fruitTable tr");
@@ -261,29 +254,15 @@ function checkSentDatePost() {
         fruitBoxList.push(tableObj);
 	});
 
-	form["fruitBoxList"] = fruitBoxList;
-//	form["fruitBoxList"] = objFruitBoxList;
-//	form["fruitBoxList"] = $.parseJSON(replaceDoubleQuotes($("#fruitBoxList").val()));
-//	form["fruitBoxList"] = replaceDoubleQuotes($("#fruitBoxList").val());
-
-//	var form = {
-//			regDateYear : $("#regDateYear").val(),
-//			regDateMonth : $("#regDateMonth").val(),
-//			regDateDay : $("#regDateDay").val(),
-//			yetSent : $("#yetSent").val(),
-//			alreadySent : $("#alreadySent").val(),
-//			sentDateYear : $("#sentDateYear").val(),
-//			sentDateMonth : $("#sentDateMonth").val(),
-//			sentDateDay : $("#sentDateDay").val()
-//	}
+	bean["sentFlag"] = sentFlag;
+	bean["fruitBoxList"] = fruitBoxList;
 
 	$.ajax({
 		type : "POST",
 		async: true,
 		contentType : "application/json",
 		url : contextPath + "/checkSentDatePost",
-		data : JSON.stringify(form),
-//		data : form,
+		data : JSON.stringify(jsonRequestBean),
 		dataType : 'json',
 		success : function(data) {
 			if (data.result === "NORMAL") {

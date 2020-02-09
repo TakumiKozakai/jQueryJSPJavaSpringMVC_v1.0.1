@@ -2,6 +2,8 @@ package com.fruit.controller;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -20,6 +22,7 @@ import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fruit.controller.form.Form;
 import com.fruit.domain.bean.CheckRegDate_RequestBean;
@@ -28,6 +31,7 @@ import com.fruit.domain.bean.CheckSentDate_RequestBean;
 import com.fruit.domain.bean.CheckSentDate_ResponseBean;
 import com.fruit.domain.bean.CreateFruit_RequestBean;
 import com.fruit.domain.bean.CreateFruit_ResponseBean;
+import com.fruit.domain.data.FruitBox;
 import com.fruit.domain.service.CreateFruitServiceImpl;
 
 /** *
@@ -91,7 +95,7 @@ public class HomeController {
 	 */
 	@GetMapping(value = "/checkRegDateGet")
 	@ResponseBody
-	public String checkRegDate(@RequestParam String requestStrJson, HttpServletRequest request)
+	public String checkRegDate(@RequestParam String jsonRequestBean, HttpServletRequest request)
 			throws JsonParseException, JsonMappingException, IOException {
 
 		ObjectMapper objectMapper = new ObjectMapper();
@@ -99,7 +103,7 @@ public class HomeController {
 		CheckRegDate_RequestBean req = new CheckRegDate_RequestBean();
 		CheckRegDate_ResponseBean res = new CheckRegDate_ResponseBean();
 
-		req = objectMapper.readValue(requestStrJson, CheckRegDate_RequestBean.class);
+		req = objectMapper.readValue(jsonRequestBean, CheckRegDate_RequestBean.class);
 		res.setResult("NORMAL");
 
 		if(4 < req.getRegDateYear().length()) {
@@ -125,20 +129,31 @@ public class HomeController {
 	 */
 	@PostMapping(value = "/checkSentDatePost")
 	@ResponseBody
-	public String checkSentDate(@RequestBody String form) {
+	public String checkSentDate(@RequestBody String jsonRequestBean) {
 
 		String strResponse  = "";
 
 		try {
+
 			ObjectMapper objectMapper = new ObjectMapper();
+			JsonNode jsonNode = objectMapper.readTree(jsonRequestBean);
 
 			CheckSentDate_RequestBean req = new CheckSentDate_RequestBean();
 			CheckSentDate_ResponseBean res = new CheckSentDate_ResponseBean();
 
-					req = objectMapper.readValue(form, CheckSentDate_RequestBean.class);
-			//		List<FruitBox> fruitBoxList  = new ArrayList<FruitBox>();
+			List<FruitBox> fruitBoxList = new ArrayList<FruitBox>();
 
-//			Form formA = objectMapper.readValue(form, Form.class);
+			for (int i = 0; i < jsonNode.get("fruitBoxList").size(); i++) {
+				FruitBox fruitBox = new FruitBox();
+				fruitBox.setBoxName(jsonNode.get("fruitBoxList").get(i).get("boxName").asText());
+				fruitBox.setRegDate(jsonNode.get("fruitBoxList").get(i).get("regDate").asText());
+				fruitBox.setSentDate(jsonNode.get("fruitBoxList").get(i).get("sentDate").asText());
+
+				fruitBoxList.add(fruitBox);
+			}
+
+			req.setSentFlag(jsonNode.get("sentFlag").asText());
+			req.setFruitBoxList(fruitBoxList);
 
 			res.setResult("NORMAL");
 
