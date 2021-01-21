@@ -19,8 +19,9 @@
 			<p>${now}</p>
 		</div>
 		<div></div>
-		<div style="width: 600px;">
-			<table border="1" style="border-collapse: collapse; word-break; break-all; table-layout: fixed;">
+		<div style="height: 72px; width: 400px; overflow: auto; white-space: nowrap;">
+			<!-- <table id="fruitTable" border="1" style="border-collapse: collapse; word-break; break-all; table-layout: fixed;"> -->
+			<table id="fruitTable" border="1" style="border-collapse: collapse; table-layout: fixed;">
 				<tr>
 					<th width="50px">選択</th>
 					<th width="50px">新規</th>
@@ -29,10 +30,10 @@
 					<th width="150px">登録日</th>
 					<th width="150px">送付日</th>
 				</tr>
-			</table>
-		</div>
-		<div id="fruitInfoDiv" style="width: 600px;">
-			<table id="fruitTable" border="1" style="border-collapse: collapse; word-break; break-all; table-layout: fixed;">
+			<!-- </table> -->
+		<!-- </div> -->
+		<!-- <div id="fruitInfoDiv" style="width: 600px;"> -->
+			<!-- <table id="fruitTable" border="1" style="border-collapse: collapse; word-break; break-all; table-layout: fixed;"> -->
 				<tr style="display: none;">
 					<td width="50px" align="center"><input type="checkbox" name="select"></td>
 					<td width="50px" class="newFlag" align="center" style="color: red;"></td>
